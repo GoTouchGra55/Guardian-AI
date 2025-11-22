@@ -1,4 +1,4 @@
-# 🛡️ K2 Think Constitutional AI - SOC Security Assistant
+# 🛡️ AI SOC Security Assistant
 
 **Production-Ready Prompt Injection Defense for Security Operations Centers**
 
