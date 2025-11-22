@@ -6,15 +6,11 @@ from datetime import datetime
 from typing import List, Dict, Any
 import pandas as pd
 from datasets import load_dataset
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-import traceback
-from sklearn.model_selection import train_test_split
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.units import inch
 
 # Import our safety wrapper
@@ -166,7 +162,7 @@ def generate_pdf_report(scenario_name: str, attack_text: str, result: Dict[str, 
         
         severity_colors = {
             'CRITICAL': colors.HexColor('#FF453A'),
-            'HIGH': colors.HexColor('#FF9500'),
+            'HIGH': colors.HexColor("#E9931A"),
             'MEDIUM': colors.HexColor('#FFD60A'),
             'LOW': colors.HexColor('#30D158')
         }
@@ -348,6 +344,7 @@ st.markdown("""
     .stSelectbox span {
         visibility: visible !important;
         opacity: 1 !important;
+        border-radius: 1rem;
     }
     
     .big-font {
@@ -790,7 +787,7 @@ def render_metrics_dashboard(wrapper: K2ThinkSafetyWrapper):
                 })
             
             rule_df = pd.DataFrame(rule_data)
-            st.dataframe(rule_df, hide_index=True, use_container_width=True)
+            st.dataframe(rule_df, hide_index=True, width='stretch')
             
             if len(sorted_rules) > 10:
                 st.caption(f"Showing top 10 of {len(sorted_rules)} triggered rules")
@@ -896,14 +893,15 @@ def main():
     """Main Streamlit application."""
     
     # Header
-    st.title("🛡️ Guardian AI - K2Think Security Assistant")
     st.markdown("""
-    **Constitutional AI Defense for Security Operations Centers**
-    
-    Protecting LLMs from prompt injection attacks in SOC environments with real-time detection,
-    side-by-side vulnerability demonstration, and comprehensive testing.
-    """)
-    
+    <div class="main-header">
+        <h1>Guardian AI - K2Think Security Assistant</h1>
+        <h3>Constitutional AI Defense for SOC environments</h3>
+                <h6>Protecting LLMs from prompt injection attacks in SOC environments with real-time detection,
+    side-by-side vulnerability demonstration, and comprehensive testing.</h6>
+    </div>
+    """, unsafe_allow_html=True)
+
     # Top Menu Bar
     menu_cols = st.columns([3, 3, 3, 1])
     
@@ -934,12 +932,13 @@ def main():
     
     with menu_cols[3]:
         demo_mode = st.checkbox("🎬 Demo", help="Show demo data with realistic metrics", key="demo_mode")
-        
+
         # Rules download button - directly downloads PDF without intermediate button
         # Generate PDF data only once and store in session state
         if 'pdf_generated' not in st.session_state:
             st.session_state.pdf_generated = False
     
+
     # Initialize wrapper
     wrapper = initialize_wrapper()
     
@@ -968,7 +967,7 @@ def main():
             mime="application/pdf",
             key="download_rules_direct",
             help="Download Constitutional AI Rules & System Status (PDF)",
-            use_container_width=True
+            width='stretch'
         )
     
     # Inject demo data if demo mode is enabled
@@ -1235,7 +1234,7 @@ def main():
             else:
                 # Show preview
                 with st.expander("👀 Preview Dataset"):
-                    st.dataframe(test_df.head(10), use_container_width=True)
+                    st.dataframe(test_df.head(10), width='stretch')
                 
                 # Evaluation settings
                 eval_col1, eval_col2 = st.columns(2)
@@ -1328,7 +1327,7 @@ def main():
                         st.metric("Avg Latency", f"{avg_latency:.0f}ms")
                     
                     # Show results table
-                    st.dataframe(batch_results, use_container_width=True, height=400)
+                    st.dataframe(batch_results, width='stretch', height=400)
                     
                     # Download results
                     csv_export = batch_results.to_csv(index=False)
@@ -1445,7 +1444,7 @@ def main():
                     st.metric("Avg Latency", f"{results_df['Latency (ms)'].mean():.0f}ms")
                 
                 # Results table
-                st.dataframe(results_df, use_container_width=True, hide_index=True)
+                st.dataframe(results_df, width='stretch', hide_index=True)
                 
                 # Download results
                 csv = results_df.to_csv(index=False)
@@ -1608,7 +1607,7 @@ def main():
                 st.metric("Block Rate", f"{block_percentage:.1f}%")
             
             # Show results table
-            st.dataframe(results_df, use_container_width=True)
+            st.dataframe(results_df, width='stretch')
             
             # PDF Download for all tests
             if st.button("📄 Download Complete Report as PDF", type="primary", key="download_all_red_team_pdf"):
@@ -1751,7 +1750,7 @@ def main():
                     st.success("✅ Analysis complete!")
                     
                     results_df = pd.DataFrame(sample_results)
-                    st.dataframe(results_df, use_container_width=True)
+                    st.dataframe(results_df, width='stretch')
                     
                     # Show metrics
                     blocked = results_df['blocked'].sum()
@@ -1822,12 +1821,12 @@ def main():
                     'Null Count': test_results_df.isnull().sum().values,
                     'Unique Values': [test_results_df[col].nunique() for col in test_results_df.columns]
                 })
-                st.dataframe(col_info, hide_index=True, use_container_width=True)
+                st.dataframe(col_info, hide_index=True, width='stretch')
             
             # Data Preview
             st.markdown("#### 👀 Data Preview")
             preview_rows = st.slider("Rows to preview", 5, min(50, len(test_results_df)), 10, key="preview_slider_tab5")
-            st.dataframe(test_results_df.head(preview_rows), use_container_width=True)
+            st.dataframe(test_results_df.head(preview_rows), width='stretch')
             
             # Offer to run evaluation if this is raw data (doesn't have 'blocked' column)
             if 'blocked' not in test_results_df.columns:
@@ -1924,7 +1923,7 @@ def main():
                             st.metric("Block Rate", f"{final_block_rate:.1f}%")
                         
                         # Show results table
-                        st.dataframe(results_df, use_container_width=True, height=400)
+                        st.dataframe(results_df, width='stretch', height=400)
                         
                         # Download options
                         download_col1, download_col2 = st.columns(2)
@@ -2061,7 +2060,7 @@ def main():
                 
                 # Display the dataframe
                 st.markdown("#### 📋 Results Data")
-                st.dataframe(test_results_df, use_container_width=True, height=400)
+                st.dataframe(test_results_df, width='stretch', height=400)
             
             # Live CSV Visualizations
             if 'blocked' in test_results_df.columns and 'latency_ms' in test_results_df.columns:
