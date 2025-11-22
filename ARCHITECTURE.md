@@ -25,8 +25,8 @@ Version 2.0 | Last Updated: October 24, 2025
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                         USER INTERFACE                            │
-│                      (Web Browser Client)                         │
+│                         USER INTERFACE                           │
+│                      (Web Browser Client)                        │
 └────────────────────────┬─────────────────────────────────────────┘
                          │ HTTP/WebSocket
                          ▼
